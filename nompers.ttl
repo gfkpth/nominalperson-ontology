@@ -1,0 +1,244 @@
+########################
+# Importing namespaces
+########################
+
+@prefix nompers: <https://gfkpth.dev/ontology/nompers#> .
+@prefix cldf: <https://cldf.clld.org/v1.0/terms.rdf#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix geo: <https://www.w3.org/2003/01/geo/#> .
+@prefix wals-id: <https://wals.info/languoid/> .
+
+
+#########################
+# Metadata for ontology
+#########################
+
+nompers: a owl:Ontology ;
+    dct:title "Crosslinguistic Ontology of Nominal Person (NomPersCLONT)" ;
+    dct:creator "Georg F.K. Höhn" ;
+    dct:created "2026-03-03"^^xsd:date ;
+    owl:versionIRI <https://gfkpth.dev/ontology/nompers/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:description "An ontology for a crosslinguistic typology of adnominal person marking." .
+
+################################
+# Languoid-related definitions
+################################
+
+# ======================================================================
+# Class: nompers:Languoid
+# ======================================================================
+# generic languoid class
+# allows implementation of recursive genealogical trees
+
+nompers:Languoid a owl:Class ;
+    rdfs:label "Languoid" ;
+    rdfs:comment "Abstract superclass for language-like entities" .
+
+
+# ----------------------------------------------------------------------
+#   Properties for nompers:Languoid
+# ----------------------------------------------------------------------
+
+nompers:inRegion a owl:ObjectProperty ;
+    rdfs:label "Region" ;
+    rdfs:comment "Region in which a languoid is attested" ;
+    rdfs:domain nompers:Languoid ;
+    rdfs:range nompers:Region .
+
+# for now just model glottocode and WALS-id as strings
+nompers:hasGlottocode a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label      "Glottocode" ;
+    rdfs:domain     nompers:Languoid ;
+    rdfs:range      xsd:string .
+
+nompers:hasWALSid   a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label      "WALS ID" ;
+    rdfs:domain     nompers:Languoid ;
+    rdfs:range      xsd:string .
+
+nompers:isTerminal a owl:DatatypeProperty ;
+    rdfs:label      "is terminal" ;
+    rdfs:comment    "Indicates whether a languoid is a terminal node." ;
+    rdfs:domain     nompers:Languoid ;
+    rdfs:range      xsd:bool .
+
+nompers:hasCoordinates a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has coordinates" ;
+    rdfs:domain nompers:Languoid ;
+    rdfs:range geo:Point .
+
+# ======================================================================
+# Class: nompers:Language (terminal Languoid)
+# ======================================================================
+
+nompers:Language rdfs:subClassOf nompers:Languoid ;
+    rdfs:label "Language" ;
+    rdfs:comment "A concrete languoid" ;
+    rdfs:subClassOf nompers:Languoid ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty nompers:isTerminal ;
+        owl:hasValue true
+    ] .
+
+
+
+
+# ----------------------------------------------------------------------
+#   Properties for nompers:Language
+# ----------------------------------------------------------------------
+
+# simplified implementation of genealogical properties 
+# to be removed if need recursive Languoid structuring of genealogical trees arises
+nompers:genusName a owl:DatatypeProperty ;
+    rdfs:domain nompers:Language ;
+    rdfs:range xsd:string ;
+    rdfs:label "Genus name (from dataset)" ;
+    rdfs:comment "Currently a string; could be removed if Languoids is refactored for recursive genealogical navigation." .
+
+nompers:familyName a owl:DatatypeProperty ;
+    rdfs:domain nompers:Language ;
+    rdfs:range xsd:string ;
+    rdfs:label "Family name (from dataset)" ;
+    rdfs:comment "Currently a string; could be removed if Languoids is refactored for recursive genealogical navigation." .
+
+
+
+# ======================================================================
+# Class: nompers:Region
+# ======================================================================
+
+nompers:Region a owl:Class ;
+    rdfs:label "Region" ;
+    rdfs:comment "Generic geographical region (superclass)" .
+
+
+nompers:RegionGlottolog a owl:Class ;
+    owl:subClassOf nompers:Region ;
+    rdfs:label "Region (Glottolog)" ;
+    rdfs:comment "Geographical region as defined in Glottolog" ;
+    rdfs:seeAlso "https://glottolog.org/meta/glossary#macroarea" .
+
+nompers:RegionWALS a owl:Class ;
+    owl:subClassOf nompers:Region ;
+    rdfs:label "Region (WALS)" ;
+    rdfs:comment "Geographical region as defined in WALS" .
+
+
+
+
+# ======================================================================
+# Class: nompers:Parameter
+# ======================================================================
+nompers:Parameter a owl:Class ;
+    rdfs:label "Parameter" ;
+    rdfs:comment "A linguistic parameter" ;
+    owl:subClassOf [ 
+        a owl:Restriction ;
+        owl:onProperty nompers:hasValue ;
+        owl:minCardinality 1 
+    ] .
+
+# ----------------------------------------------------------------------
+#   Properties for nompers:Parameter
+# ----------------------------------------------------------------------
+nompers:hasValue a owl:ObjectProperty ;
+    rdfs:label "has value" ;
+    rdfs:comment "A possible value of the parameter" ;
+    rdfs:domain nompers:Parameter ;
+    rdfs:range nompers:ParameterValue .
+
+
+
+
+# could be defined as functional property, but allowing multiple names accounts for the fact that some parameters may be known by multiple names
+nompers:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name" ;
+    rdfs:comment "An identifying name of a parameter" ;
+    rdfs:domain nompers:Parameter ;
+    rdfs:range xsd:string .
+
+
+# ======================================================================
+# Class: nompers:ParameterValue
+# ======================================================================
+nompers:ParameterValue a owl:Class ;
+    rdfs:label "Parameter value" ;
+    rdfs:comment "The value of a parameter" .
+
+
+# ----------------------------------------------------------------------
+#   Properties for nompers:ParameterValue
+# ----------------------------------------------------------------------
+
+nompers:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name" ;
+    rdfs:comment "An identifying name of a parameter value" ;
+    rdfs:domain nompers:ParameterValue ;
+    rdfs:range xsd:string .
+
+
+# ======================================================================
+# Class: nompers:Source
+# ======================================================================
+
+nompers:Source a owl:Class ;
+    rdfs:label "Source" ;
+    rdfs:comment "A source" .
+
+# ----------------------------------------------------------------------
+#   Properties for nompers:Source
+# ----------------------------------------------------------------------
+
+nompers:hasBibtex a owl:DatatypeProperty ;
+    rdfs:domain nompers:Source ;
+    rdfs:range xsd:string ;
+    rdfs:label "has bibtex" ;
+    rdfs:comment "BibTeX string for a data source" .
+
+# ======================================================================
+# Class: nompers:ParameterAssociation
+# ======================================================================
+
+nompers:ParameterAssociation  a owl:Class ;
+    rdfs:label "Parameter association" ;
+    rdfs:comment "Relates a parameter + value to a languoid" ;
+    nompers:relatesLanguoid nompers:Languoid ;
+    nompers:relatesParam nompers:Param;
+    nompers:relatesParameterValue nompers:ParameterValue ;
+    nompers:sourcedFrom nompers:Source .
+
+
+# ----------------------------------------------------------------------
+#   Properties for nompers:ParameterAssociation
+# ----------------------------------------------------------------------
+
+nompers:relatesLanguoid  a owl:ObjectProperty ;
+    rdfs:domain nompers:ParameterAssociation ;
+    rdfs:range nompers:Languoid ;
+    rdfs:label "for languoid" ;
+    rdfs:comment "relates a parameter association to a languoid" .
+
+nompers:relatesParam     a owl:ObjectProperty ;
+    rdfs:domain nompers:ParameterAssociation ;
+    rdfs:range nompers:Parameter ;
+    rdfs:label "relates a parameter association to a parameter" .
+    
+nompers:relatesParameterValue  a owl:ObjectProperty ;
+    rdfs:domain nompers:ParameterAssociation ;
+    rdfs:range nompers:ParameterValue ;
+    rdfs:label "relates a parameter association to a parameter value" .
+
+nompers:sourcedFrom      a owl:ObjectProperty ;
+    rdfs:domain nompers:ParameterAssociation ;
+    rdfs:range nompers:Source ;
+    rdfs:label "sourced from" ;
+    rdfs:comment "Source of the parameter association" .
+
+
