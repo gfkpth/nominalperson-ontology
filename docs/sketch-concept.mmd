@@ -1,0 +1,51 @@
+classDiagram
+class nompers:Region {
+}
+class nompers:ParameterAssociation {
+}
+class nompers:RegionWALS {
+}
+class nompers:Parameter {
+has name : xsd:string  // An identifying name of a parameter value
+}
+class nompers:ParameterValue {
+has name : xsd:string  // An identifying name of a parameter value
+}
+class nompers:Source {
+has bibtex : xsd:string  // BibTeX string for a data source
+}
+class nompers:Example {
+Primary Text : xsd:string  // The example text in the source language.
+Analyzed Word : xsd:string  // Indicates the language associated with an example.
+}
+class nompers:Language {
+ISO 639-3 Code : xsd:string  // ISO 639-3 code for the language.
+Genus name (from dataset) : xsd:string  // Currently a string; could be removed if Languoids is refactored for recursive genealogical navigation.
+Family name (from dataset) : xsd:string  // Currently a string; could be removed if Languoids is refactored for recursive genealogical navigation.
+ID : xsd:string  // Unique identifier for the language.
+Name : xsd:string  // Name of the language.
+Macroarea : xsd:string  // Macroarea where the language is located.
+Latitude : xsd:decimal  // Geographic latitude of the language location.
+Longitude : xsd:decimal  // Geographic longitude of the language location.
+Glottocode : xsd:string  // Glottolog code for the language.
+ISO 639-3 Code : xsd:string  // ISO 639-3 code for the language.
+WALS Code : xsd:string  // WALS code for the language.
+ISO Codes : xsd:string  // ISO codes associated with the language.
+}
+class nompers:Languoid {
+Glottocode : xsd:string
+WALS ID : xsd:string
+is terminal : xsd:bool  // Indicates whether a languoid is a terminal node.
+}
+class nompers:RegionGlottolog {
+}
+nompers:Language --|> nompers:Languoid
+nompers:RegionGlottolog --|> nompers:Region
+nompers:RegionWALS --|> nompers:Region
+nompers:Languoid --> nompers:Region : Region  // Region in which a languoid is attested
+nompers:Languoid --> geo1:Point : has coordinates
+nompers:Parameter --> nompers:ParameterValue : has value  // A possible value of the parameter
+nompers:ParameterAssociation --> nompers:Languoid : for languoid  // relates a parameter association to a languoid
+nompers:ParameterAssociation --> nompers:Parameter : relates a parameter association to a parameter
+nompers:ParameterAssociation --> nompers:ParameterValue : relates a parameter association to a parameter value
+nompers:ParameterAssociation --> nompers:Source : sourced from  // Source of the parameter association
