@@ -1,29 +1,29 @@
 import argparse
 from rdflib import Graph, RDFS, RDF, OWL, Namespace
 
-def get_prefix(uri):
+def get_prefix(uri,no_prefix=False):
     for prefix, ns in PREFIXES.items():
         if uri.startswith(ns):
-            # if no_prefix:
-            #     return f"{uri[len(str(ns)):]}"
-            # else:
-            return f"{prefix}:{uri[len(str(ns)):]}"
+            if no_prefix:
+                return f"{uri[len(str(ns)):]}"
+            else:
+                return f"{prefix}_{uri[len(str(ns)):]}"
     return uri
 
-def generate_mermaid_diagram(graph, diagram_type='classDiagram', include_datatype_properties=True, no_prefix=False):
-    mermaid = [diagram_type]
+def generate_class_diagram(graph, include_datatype_properties=True, no_prefix=False, incl_comments=False):
+    mermaid = ['classDiagram']
 
     # Collect classes
     classes = set()
     for s, p, o in graph.triples((None, RDF.type, OWL.Class)):
-        class_name = get_prefix(s)
+        class_name = get_prefix(s,no_prefix)
         classes.add(class_name)
 
     # # Collect subclasses
     subclass_relationships = []
     for s, p, o in graph.triples((None, RDFS.subClassOf, None)):
-        super_class = get_prefix(o)
-        sub_class = get_prefix(s)
+        super_class = get_prefix(o,no_prefix)
+        sub_class = get_prefix(s,no_prefix)
         if sub_class != super_class and super_class in classes:
             subclass_relationships.append((sub_class, super_class))
 
@@ -31,7 +31,7 @@ def generate_mermaid_diagram(graph, diagram_type='classDiagram', include_datatyp
     # Collect object properties
     object_properties = {}
     for s, p, o in graph.triples((None, RDF.type, OWL.ObjectProperty)):
-        property_name = get_prefix(s)
+        property_name = get_prefix(s,no_prefix)
         if property_name not in object_properties:
             object_properties[property_name] = {'domains': [], 'ranges': []}
 
@@ -40,7 +40,7 @@ def generate_mermaid_diagram(graph, diagram_type='classDiagram', include_datatyp
     # Collect datatype properties
     datatype_properties = {}
     for s, p, o in graph.triples((None, RDF.type, OWL.DatatypeProperty)):
-        property_name = get_prefix(s)
+        property_name = get_prefix(s,no_prefix)
         if property_name not in datatype_properties:
             datatype_properties[property_name] = {'domains': [], 'ranges': []}
 
@@ -48,43 +48,39 @@ def generate_mermaid_diagram(graph, diagram_type='classDiagram', include_datatyp
     # Collect domains and ranges of properties
     for s, p, o in graph.triples((None, None, None)):
         if p == RDFS.domain:
-            print(s + p + o)
-            property_name = get_prefix(s)
-            class_name = get_prefix(o)
+            property_name = get_prefix(s,no_prefix)
+            class_name = get_prefix(o,no_prefix)
             if property_name in object_properties:
                 object_properties[property_name]['domains'].append(class_name)
             elif property_name in datatype_properties:
                 datatype_properties[property_name]['domains'].append(class_name)
         elif p == RDFS.range:
-            property_name = get_prefix(s)
-            class_name = get_prefix(o)
+            property_name = get_prefix(s,no_prefix)
+            class_name = get_prefix(o,no_prefix)
             if property_name in object_properties:
                 object_properties[property_name]['ranges'].append(class_name)
             elif property_name in datatype_properties:
                 datatype_properties[property_name]['ranges'].append(class_name)
 
-    print("Object properties")
-    print(object_properties)
-    print("Datatype props")
-    print(datatype_properties)
     # Collect labels and comments for properties
     for s, p, o in graph.triples((None, RDFS.label, None)):
         if p == RDFS.label:
-            property_name = get_prefix(s)
+            property_name = get_prefix(s,no_prefix)
             label = o.toPython()
             if property_name in object_properties:
                 object_properties[property_name]['label'] = label
             elif property_name in datatype_properties:
                 datatype_properties[property_name]['label'] = label
 
-    for s, p, o in graph.triples((None, RDFS.comment, None)):
-        if p == RDFS.comment:
-            property_name = get_prefix(s)
-            comment = o.toPython()
-            if property_name in object_properties:
-                object_properties[property_name]['comment'] = comment
-            elif property_name in datatype_properties:
-                datatype_properties[property_name]['comment'] = comment
+    if incl_comments:
+        for s, p, o in graph.triples((None, RDFS.comment, None)):
+            if p == RDFS.comment:
+                property_name = get_prefix(s,no_prefix)
+                comment = o.toPython()
+                if property_name in object_properties:
+                    object_properties[property_name]['comment'] = comment
+                elif property_name in datatype_properties:
+                    datatype_properties[property_name]['comment'] = comment
 
     # Add classes and datatype properties to Mermaid
     for cls in classes:
@@ -103,7 +99,7 @@ def generate_mermaid_diagram(graph, diagram_type='classDiagram', include_datatyp
     # Add subclass relationships to Mermaid
     for sub_class, super_class in subclass_relationships:
         if sub_class != super_class and super_class in classes:
-            mermaid.append(f"{sub_class} --|> {super_class}")
+            mermaid.append(f"{sub_class} --|> {super_class} : subClassOf")
 
     # Add object properties to Mermaid
     for prop_name, prop_info in object_properties.items():
@@ -116,6 +112,75 @@ def generate_mermaid_diagram(graph, diagram_type='classDiagram', include_datatyp
             mermaid[-1] += f'  // {comment}'
 
     return "\n".join(mermaid)
+
+
+
+def generate_graph_diagram(graph, include_datatype_properties=True, no_prefix=False, incl_comments=False):
+    """Generates a Mermaid graph diagram."""
+    mermaid = ["graph TD"]
+
+    # Collect nodes
+    nodes = set()
+    for s, p, o in graph.triples((None, RDF.type, None)):
+        node_name = get_prefix(s, no_prefix)
+        nodes.add(node_name)
+
+    # Collect edges (relationships)
+    edges = []
+    for s, p, o in graph.triples((None, None, None)):
+        if p == RDFS.subClassOf:  # treat subclassof as edges
+            from_node = get_prefix(s, no_prefix)
+            to_node = get_prefix(o, no_prefix)
+            edges.append((from_node, to_node, "subClassOf"))
+        elif p == RDFS.domain:
+            from_node = get_prefix(s, no_prefix)
+            to_node = get_prefix(o, no_prefix)
+            edges.append((from_node, to_node, "domain"))
+        elif p == RDFS.range:
+            from_node = get_prefix(s, no_prefix)
+            to_node = get_prefix(o, no_prefix)
+            edges.append((from_node, to_node, "range"))
+        else:  # treat all other properties as edges
+            from_node = get_prefix(s, no_prefix)
+            to_node = get_prefix(o, no_prefix)
+            edges.append((from_node, to_node, "related"))  # generic relation
+
+
+    # Add node definitions
+    for node in nodes:
+        label = get_prefix(node, no_prefix)  # use prefixed or local name
+        mermaid.append(f"{node} [{label}];")
+
+    # Add edge definitions
+    for from_node, to_node, relation in edges:
+        mermaid.append(f"{from_node} --> {to_node};")
+    
+    if incl_comments:
+        for s, p, o in graph.triples((None, RDFS.comment, None)):
+            if p == RDFS.comment:
+                property_name = get_prefix(s, no_prefix)
+                comment = o.toPython()
+                # Find the corresponding node and add the comment as a tooltip.
+                # This part is tricky because we need to find the node that the comment is associated with.
+                # This implementation assumes the comment is directly associated with the node in the graph
+                # and adds it as a tooltip.  You may need to adjust this based on your data model.
+                node_to_add_comment = get_prefix(s, no_prefix) # the node itself
+
+                mermaid.append(f"/* {node_to_add_comment} : {comment} */")
+
+
+    return "\n".join(mermaid)
+
+
+def generate_mermaid_diagram(graph, diagram_type='classDiagram', include_datatype_properties=True, no_prefix=False, incl_comments=False):
+    if diagram_type == 'classDiagram':
+        return generate_class_diagram(graph, include_datatype_properties, no_prefix, incl_comments)
+    elif diagram_type == 'graph TD':
+        return generate_graph_diagram(graph, include_datatype_properties, no_prefix, incl_comments)
+    else:
+        raise ValueError(f"Unsupported diagram type: {diagram_type}")
+
+
 
 def extract_namespaces(graph):
     namespaces = {}
