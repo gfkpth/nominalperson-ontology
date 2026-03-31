@@ -77,24 +77,28 @@ This pattern allows the modelling of divergent claims regarding the same languoi
 
 ## Languoid Layer
 
+```mermaid
+nompers:Language --rdf:subClassOf --> nompers:Languoid
+nompers:Genus --rdf:subClassOf --> nompers:Languoid
+nompers:Family --rdf:subClassOf --> nompers:Languoid
 ```
-nompers:Languoid
-nompers:Language
-```
 
-Languages are modeled as terminal nodes of the languoid hierarchy. 
-Currently, the hierarchy is a basic  genealogical relations are coded
+For a simplified representation of genealogical relations, the ontology reifies three subtypes of languoids: languages, genera and families. (A recursive hierarchy of variable depth could be implemented for a more realistic model, but for the target dataset that seems to be overkill at this point.) 
 
 
-### nompers:Languoid
+### Properties of nompers:Languoid
 
-Identifiers include:
+- [glottocode](https://glottolog.org/)
+- isTerminal
 
-- Glottocode
-- WALS ID
-- ISO 639-3 code
 
-Languages may also have geographic coordinates, modelled using `geo:Point`
+### nompers:Language
+
+These datatype properties are associated with terminal-level languoids:
+
+- [WALS](https://wals.info) ID
+- [ISO 639-3](https://iso639-3.sil.org/code_tables/639/data) code
+- geographic coordinates, modelled using `geo:Point`
 
 ---
 
