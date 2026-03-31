@@ -75,10 +75,7 @@ nompers:isTerminal a owl:DatatypeProperty ;
     rdfs:domain     nompers:Languoid ;
     rdfs:range      xsd:boolean .
 
-nompers:hasCoordinates a owl:ObjectProperty, owl:FunctionalProperty ;
-    rdfs:label "has coordinates" ;
-    rdfs:domain nompers:Languoid ;
-    rdfs:range geo:Point .
+
 
 # ======================================================================
 # Class: nompers:Language (terminal Languoid)
@@ -128,6 +125,10 @@ nompers:hasIso639P3Code a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://iso639-3.sil.org/> ;
     rdfs:label "ISO 639-3 Code" .
 
+nompers:hasCoordinates a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has coordinates" ;
+    rdfs:domain nompers:Language ;
+    rdfs:range geo:Point .
 
 # ======================================================================
 #  Class nompers:Genus
