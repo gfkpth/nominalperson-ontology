@@ -78,9 +78,10 @@ This pattern allows the modelling of divergent claims regarding the same languoi
 ## Languoid Layer
 
 ```mermaid
-nompers:Language --rdf:subClassOf --> nompers:Languoid
-nompers:Genus --rdf:subClassOf --> nompers:Languoid
-nompers:Family --rdf:subClassOf --> nompers:Languoid
+graph LR
+   nompers:Language --rdf:subClassOf --> nompers:Languoid
+   nompers:Genus --rdf:subClassOf --> nompers:Languoid
+   nompers:Family --rdf:subClassOf --> nompers:Languoid
 ```
 
 For a simplified representation of genealogical relations, the ontology reifies three subtypes of languoids: languages, genera and families. (A recursive hierarchy of variable depth could be implemented for a more realistic model, but for the target dataset that seems to be overkill at this point.) 
