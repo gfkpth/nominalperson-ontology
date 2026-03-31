@@ -1,8 +1,8 @@
 cff-version: 1.2.0
-title: "Crosslinguistic Ontology on Nominal Person (NomPersCLONT)"
+title: "Nominal Person Ontology (NomPersOnt)"
 authors:
   - family-names: "Höhn"
     given-names: "Georg F.K."
-version: 0.1.0
+version: 0.0.1
 doi: 10.xxxx/zenodo.xxxxx
 license: CC-BY-4.0
