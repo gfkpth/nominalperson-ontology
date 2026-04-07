@@ -84,7 +84,7 @@ graph LR
    nompers:Family --rdf:subClassOf --> nompers:Languoid
 ```
 
-For a simplified representation of genealogical relations, the ontology reifies three subtypes of languoids: languages, genera and families. (A recursive hierarchy of variable depth could be implemented for a more realistic model, but for the target dataset that seems to be overkill at this point.) 
+For a simplified representation of genealogical relations, the ontology reifies three subtypes of languoids: languages, genera and families. (A recursive hierarchy of variable depth could be implemented for a more realistic model, but that seems to be overkill at this point given that the target dataset defines specific genera and families.) 
 
 
 ### Properties of nompers:Languoid
@@ -237,7 +237,7 @@ Versioning follows **semantic versioning**.
 Current version:
 
 ```
-0.0.1
+0.0.2
 ```
 
 This version is experimental and should not be considered stable yet.
