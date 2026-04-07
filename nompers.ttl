@@ -20,9 +20,9 @@ nompers: a owl:Ontology ;
     dct:title "Nominal Person Ontology (NomPersOnt)" ;
     dct:creator "Georg F.K. Höhn" ;
     dct:created "2026-03-31"^^xsd:date ;
-    owl:versionIRI <https://w3id.org/nompers/0.0.1> ;
-    owl:versionInfo "0.0.1" ;
-    dct:modified "2026-03-31"^^xsd:date ;
+    owl:versionIRI <https://w3id.org/nompers/0.0.2> ;
+    owl:versionInfo "0.0.2" ;
+    dct:modified "2026-04-07"^^xsd:date ;
     dct:publisher <https://morelight.goip.de> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:description "An ontology for a crosslinguistic typology of adnominal person marking." ;
@@ -44,7 +44,7 @@ nompers: a owl:Ontology ;
 nompers:Languoid a owl:Class ;
     rdfs:label "Languoid" ;
     rdfs:comment "Abstract superclass for language-like entities" ;
-    owl:owl:disjointUnionOf (nompers:Language nompers:Genus nompers:Family) ;
+    owl:disjointUnionOf (nompers:Language nompers:Genus nompers:Family) ;
     rdfs:subClassOf skos:Concept .
 
 
@@ -54,7 +54,7 @@ nompers:Languoid a owl:Class ;
 
 nompers:inRegion a owl:ObjectProperty ;
     rdfs:label "in region" ;
-    rdfs:comment "Association to region in which a languoid is attested" ;
+    rdfs:comment "Region in which a languoid is attested" ;
     rdfs:domain nompers:Languoid ;
     rdfs:range nompers:Region .
 
@@ -69,7 +69,7 @@ nompers:hasGlottocode a owl:DatatypeProperty, owl:FunctionalProperty, owl:Invers
 
 # Using isTerminal property for identifying "languages" as opposed to language family nodes
 # This could be refined for more elegant capturing of "dialects", but will do for now
-nompers:isTerminal a owl:DatatypeProperty ;
+nompers:isTerminal a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label      "is terminal" ;
     rdfs:comment    "Indicates whether a languoid is a terminal node." ;
     rdfs:domain     nompers:Languoid ;
@@ -85,7 +85,6 @@ nompers:Language a owl:Class ;
     rdfs:label "Language" ;
     rdfs:comment "A languoid terminal node" ;
     rdfs:subClassOf nompers:Languoid ;
-    skos:broaderTransitive nompers:Genus ;
     rdfs:subClassOf [
         a owl:Restriction ;
         owl:onProperty nompers:isTerminal ;
@@ -99,17 +98,18 @@ nompers:Language a owl:Class ;
 
 # simplified implementation of genealogical hierarchies 
 # to be removed if need for recursive Languoid structuring of genealogical trees arises
-nompers:inGenus a owl:DatatypeProperty ;
+nompers:inGenus a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Language ;
     rdfs:range nompers:Genus ;
     rdfs:label "member of genus" ;
-    rdfs:comment "." .
+    rdfs:comment "Relates a language to the genus it belongs to." .
 
-nompers:inFamily a owl:DatatypeProperty ;
+nompers:inFamily a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Language ;
     rdfs:range nompers:Family ;
     rdfs:label "member of language family" ;
-    rdfs:comment "Currently a string; could be removed if Languoids is refactored for recursive genealogical navigation." .
+    rdfs:comment "Relates a language to the family it belongs to." .
+ 
 
 nompers:hasWalsId   a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label      "WALS ID" ;
@@ -121,7 +121,7 @@ nompers:hasWalsId   a owl:DatatypeProperty, owl:FunctionalProperty ;
 nompers:hasIso639P3Code a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Language ;
     rdfs:range xsd:string ;
-    rdfs:comment    "Language identifier after ISO 639-3. URI pattern: https://iso639-3.sil.org/code/{iso639_3code}" ;
+    rdfs:comment    "Language identifier following ISO 639-3. URI pattern: https://iso639-3.sil.org/code/{iso639_3code}" ;
     rdfs:isDefinedBy <https://iso639-3.sil.org/> ;
     rdfs:label "ISO 639-3 Code" .
 
@@ -135,15 +135,24 @@ nompers:hasCoordinates a owl:ObjectProperty, owl:FunctionalProperty ;
 # ======================================================================
 
 nompers:Genus a owl:Class ;
+    rdfs:subClassOf nompers:Languoid ;
+    rdfs:subClassOf [a owl:Restriction ;
+            owl:onProperty nompers:isTerminal ;
+            owl:hasValue false ] ;
     rdfs:label "Genus" ;
-    skos:broaderTransitive nompers:Family .
+    rdfs:comment "A genus-level languoid. While decisions as to what tree depth counts as a genus is somewhat arbitrary, an intermediate level of genealogical relations is useful. This follows the practice (and largely the assignments) of WALS. Names for genus instances should be provided with skos:prefLabel/skos:altLabel relations." .
 
 # ======================================================================
 #  Class nompers:Family
 # ======================================================================
 
 nompers:Family a owl:Class ;
-    rdfs:label "Language family" .
+    rdfs:subClassOf nompers:Languoid ;
+    rdfs:subClassOf [a owl:Restriction ;
+            owl:onProperty nompers:isTerminal ;
+            owl:hasValue "False" ] ;
+    rdfs:label "Language family" ;
+    rdfs:comment "A family-level languoid. Names for family instances should be provided with skos:prefLabel/skos:altLabel relations." .
 
 
 # ======================================================================
