@@ -142,6 +142,18 @@ nompers:Genus a owl:Class ;
     rdfs:label "Genus" ;
     rdfs:comment "A genus-level languoid. While decisions as to what tree depth counts as a genus is somewhat arbitrary, an intermediate level of genealogical relations is useful. This follows the practice (and largely the assignments) of WALS. Names for genus instances should be provided with skos:prefLabel/skos:altLabel relations." .
 
+nompers:hasGenusMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:inGenus ;
+    rdfs:label "has language member" ;
+    rdfs:domain nompers:Genus ;
+    rdfs:range nompers:Language .
+
+nompers:hasFamilyMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:inFamily ;
+    rdfs:label "has family member" ;
+    rdfs:domain nompers:Family ;
+    rdfs:range nompers:Language .
+
 # ======================================================================
 #  Class nompers:Family
 # ======================================================================
