@@ -1,0 +1,68 @@
+classDiagram
+class Genus {
+}
+class ParameterAssociation {
+}
+class RegionGlottolog {
+}
+class Region {
+}
+class ParameterValue {
+}
+class ControlParameter {
+}
+class Language {
+WALS ID : string
+ISO 639-3 Code : string
+}
+class Languoid {
+Glottocode : string
+is terminal : boolean
+}
+class Parameter {
+}
+class Family {
+}
+class RegionWALS {
+}
+class Example {
+Primary Text : string
+Analyzed Word : string
+Gloss : string
+Translation : string
+}
+class Point {
+latitude : string
+longitude : string
+}
+class CoreParameter {
+}
+class Source {
+has bibtex : string
+has page : string
+}
+Language --|> Languoid : subClassOf
+Genus --|> Languoid : subClassOf
+Family --|> Languoid : subClassOf
+RegionGlottolog --|> Region : subClassOf
+RegionWALS --|> Region : subClassOf
+CoreParameter --|> Parameter : subClassOf
+ControlParameter --|> Parameter : subClassOf
+Languoid --> Region : in region
+Language --> Genus : member of genus
+Language --> Family : member of language family
+Genus --> Family : is in family
+Genus --> Language : has language member
+Family --> Language : has family member
+Family --> Genus : has genus in family
+Language --> Point : has coordinates
+Region --> Languoid : has member
+Parameter --> ParameterValue : has potential value
+ParameterValue --> Parameter : is potential value of
+ParameterAssociation --> Languoid : for languoid
+ParameterAssociation --> Parameter : relates Parameter
+ParameterAssociation --> ParameterValue : relates ParameterValue
+ParameterAssociation --> Source : sourced from
+Example --> Source : sourced from
+ParameterAssociation --> Example : exemplified by
+Example --> Languoid : from Languoid

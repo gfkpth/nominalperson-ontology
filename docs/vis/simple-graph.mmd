@@ -1,0 +1,41 @@
+graph TD
+    RegionWALS
+    Example
+    Family
+    Genus
+    ParameterAssociation
+    CoreParameter
+    Languoid
+    ParameterValue
+    Parameter
+    Source
+    Point
+    Language
+    Region
+    ControlParameter
+    RegionGlottolog
+    Languoid -->|"inRegion"| Region
+    Language -->|"languageInGenus"| Genus
+    Language -->|"languageInFamily"| Family
+    Genus -->|"genusInFamily"| Family
+    Genus -->|"genusHasMember"| Language
+    Family -->|"familyHasLanguageMember"| Language
+    Family -->|"familyHasGenusMember"| Genus
+    Language -->|"hasCoordinates"| Point
+    Region -->|"regionHasMember"| Languoid
+    Parameter -->|"hasPotentialValue"| ParameterValue
+    ParameterValue -->|"isPotentialValueOf"| Parameter
+    ParameterAssociation -->|"relatesLanguoid"| Languoid
+    ParameterAssociation -->|"relatesParameter"| Parameter
+    ParameterAssociation -->|"relatesParameterValue"| ParameterValue
+    ParameterAssociation -->|"sourcedFrom"| Source
+    Example -->|"sourcedFrom"| Source
+    ParameterAssociation -->|"exemplifiedBy"| Example
+    Example -->|"inLanguoid"| Languoid
+    Language -->|"subClassOf"| Languoid
+    Genus -->|"subClassOf"| Languoid
+    Family -->|"subClassOf"| Languoid
+    RegionGlottolog -->|"subClassOf"| Region
+    RegionWALS -->|"subClassOf"| Region
+    CoreParameter -->|"subClassOf"| Parameter
+    ControlParameter -->|"subClassOf"| Parameter
