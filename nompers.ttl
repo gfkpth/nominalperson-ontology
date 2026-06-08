@@ -221,7 +221,11 @@ nompers:RegionWALS a owl:Class ;
     rdfs:comment "Geographical region as defined in WALS" .
 
 
-
+nompers:regionHasMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:inRegion ;
+    rdfs:label "has member" ;
+    rdfs:domain nompers:Region ;
+    rdfs:range nompers:Languoid .
 
 # ======================================================================
 # Class: nompers:Parameter
@@ -397,3 +401,12 @@ geo:Point a owl:Class ;
     rdfs:comment "A point representing geographic coordinates." ;
     rdfs:seeAlso <https://www.w3.org/2003/01/geo/> .
 
+geo:lat a owl:DatatypeProperty ;
+    rdfs:label "latitude" ;
+    rdfs:domain geo:Point ;
+    rdfs:range xsd:decimal .
+
+geo:long a owl:DatatypeProperty ;
+    rdfs:label "longitude" ;
+    rdfs:domain geo:Point ;
+    rdfs:range xsd:decimal .
