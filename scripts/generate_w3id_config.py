@@ -61,6 +61,22 @@ def main():
         
         write_yaml(filename, target_id, target_uri)
         print(f"Generated versioned: {filename} -> {target_id}")
+        
+        
+                # --- Add shapes config ---
+        shapes_target_id = f"{W3ID_BASE}/shapes/{version}"
+        shapes_target_uri = f"https://raw.githubusercontent.com/{GITHUB_USER}/{REPO_NAME}/{tag}/nompers-shapes.ttl"
+        shapes_filename = os.path.join(VERSION_DIR, f"shapes-{version}.yaml")
+        
+        write_yaml(shapes_filename, shapes_target_id, shapes_target_uri)
+        print(f"Generated shapes versioned: {shapes_filename} -> {shapes_target_id}")
+
+    # 4. Generate base shapes config
+    shapes_base_filename = os.path.join(CONFIG_DIR, "nompers-shapes.yaml")
+    write_yaml(shapes_base_filename, f"{W3ID_BASE}/shapes", RAW_BASE.replace("nompers.ttl", "nompers-shapes.ttl"))
+    print(f"Generated base shapes: {shapes_base_filename} -> {W3ID_BASE}/shapes")
+
+    print("\nAll done! Files are in the 'w3id_config/' directory.")
 
     print("\nAll done! Files are in the 'w3id_config/' directory.")
 
