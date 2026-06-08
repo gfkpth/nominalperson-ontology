@@ -335,7 +335,7 @@ nompers:sourcedFrom a owl:ObjectProperty ;
 
 
 nompers:exemplifiedBy a owl:ObjectProperty ;
-    rdfs:label "examplified by" ;
+    rdfs:label "exemplified by" ;
     rdfs:comment "Relates a parameter association to an example illustrating the specific parameter value for a given language" ;
     rdfs:domain nompers:ParameterAssociation ;
     rdfs:range nompers:Example .
