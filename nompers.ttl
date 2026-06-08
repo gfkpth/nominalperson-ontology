@@ -171,8 +171,7 @@ nompers:hasCoordinates a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:label "has coordinates" ;
     rdfs:comment "Geographic coordinates of a language, modelled as a geo:Point with geo:lat and geo:long datatype properties." ;
     rdfs:domain nompers:Language ;
-    rdfs:range geo:Point ;
-    rdfs:seeAlso <https://www.w3.org/2003/01/geo/#lat> .
+    rdfs:range geo:Point .
 
 # ======================================================================
 #  Class nompers:Genus
@@ -404,9 +403,9 @@ geo:Point a owl:Class ;
 geo:lat a owl:DatatypeProperty ;
     rdfs:label "latitude" ;
     rdfs:domain geo:Point ;
-    rdfs:range xsd:decimal .
+    rdfs:range xsd:string .
 
 geo:long a owl:DatatypeProperty ;
     rdfs:label "longitude" ;
     rdfs:domain geo:Point ;
-    rdfs:range xsd:decimal .
+    rdfs:range xsd:string .
