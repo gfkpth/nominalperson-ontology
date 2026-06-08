@@ -1,7 +1,7 @@
-# --- Configuration (Single Source of Truth) ---
+# --- Configuration ---
+export BASE_ID     := gfkpth/nompers-ont
 export GITHUB_USER := gfkpth
 export REPO_NAME   := nompers-ontology
-export BASE_ID     := gfkpth/nompers
 
 # These are derived from the variables above
 export W3ID_BASE   := https://w3id.org/$(BASE_ID)
@@ -9,12 +9,23 @@ export RAW_BASE    := https://raw.githubusercontent.com/$(GITHUB_USER)/$(REPO_NA
 
 # --- Targets ---
 
-.PHONY: all clean w3id-generate w3id-clean
+.PHONY: all clean generate-simplegraph generate-classdiagram generate-w3id clean-w3id
 
-all: w3id-generate
+all: 
+	generate-w3id
+	generate-simplegraph
+	generate-classdiagram
+
+generate-simplegraph:
+	@mkdir -p docs/vis
+	@python3 scripts/generate_mmd.py nompers.ttl docs/vis/simple-graph.mmd --diagram_type "graph TD" --no_prefix
+
+generate-classdiagram:
+	@mkdir -p docs/vis
+	@python3 scripts/generate_mmd.py nompers.ttl docs/vis/class-diagram.mmd --diagram_type "classDiagram" --include_datatype_properties --no_prefix
 
 ## Generate the W3ID configuration files using the helper script
-w3id-generate:
+generate-w3id:
 	@python3 scripts/generate_w3id_config.py
 
 ## Remove generated W3ID configuration files
