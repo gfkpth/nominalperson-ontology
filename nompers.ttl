@@ -20,8 +20,8 @@ nompers: a owl:Ontology ;
     dct:title "Nominal Person Ontology (NomPersOnt)" ;
     dct:creator "Georg F.K. Höhn" ;
     dct:created "2026-03-31"^^xsd:date ;
-    owl:versionIRI <https://w3id.org/nompers/0.0.2> ;
-    owl:versionInfo "0.0.2" ;
+    owl:versionIRI <https://w3id.org/nompers/0.1.0> ;
+    owl:versionInfo "0.1.0" ;
     dct:modified "2026-04-07"^^xsd:date ;
     dct:publisher <https://morelight.goip.de> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
@@ -96,20 +96,62 @@ nompers:Language a owl:Class ;
 #   Properties for nompers:Language
 # ----------------------------------------------------------------------
 
-# simplified implementation of genealogical hierarchies 
-# to be removed if need for recursive Languoid structuring of genealogical trees arises
-nompers:inGenus a owl:ObjectProperty, owl:FunctionalProperty ;
+# Genealogical relations for languoids
+#
+# This ontology uses a simplified genealogical structure with three levels:
+#   Language → Genus → Family
+#
+# The relations are:
+#   - langInGenus:      Language → Genus    (a language belongs to one genus)
+#   - langInFamily:     Language → Family   (a language belongs to one family)
+#   - genInFamily:   Genus → Family      (a genus belongs to one family)
+#
+# The reverse properties allow navigation in the opposite direction:
+#   - genHasMember:      Genus → Language
+#   - famHasLangMember:     Family → Language
+#   - famHasGenMember:    Family → Genus
+#
+# Note: All child-to-parent relations (inGenus, inFamily, isInFamily) are functional.
+# Each languoid has exactly one parent in this concept; 
+# creoles and mixed languages raise further issues, which I set aside here.
+
+nompers:langInGenus a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Language ;
     rdfs:range nompers:Genus ;
     rdfs:label "member of genus" ;
     rdfs:comment "Relates a language to the genus it belongs to." .
 
-nompers:inFamily a owl:ObjectProperty, owl:FunctionalProperty ;
+# could be inferred nompers:langInGenus and  
+nompers:langInFamily a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Language ;
     rdfs:range nompers:Family ;
     rdfs:label "member of language family" ;
     rdfs:comment "Relates a language to the family it belongs to." .
- 
+
+nompers:genInFamily a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain nompers:Genus ;
+    rdfs:range nompers:Family ;
+    rdfs:label "is in family" ;
+    rdfs:comment "Relates a genus to the language family it belongs to." .
+
+nompers:genHasMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:langInGenus ;
+    rdfs:label "has language member" ;
+    rdfs:domain nompers:Genus ;
+    rdfs:range nompers:Language .
+
+nompers:famHasLangMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:langInFamily ;
+    rdfs:label "has family member" ;
+    rdfs:domain nompers:Family ;
+    rdfs:range nompers:Language .
+
+nompers:famHasGenMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:genInFamily ;
+    rdfs:label "has genus in family" ;
+    rdfs:domain nompers:Family ;
+    rdfs:range nompers:Genus .
+
 
 nompers:hasWalsId   a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label      "WALS ID" ;
@@ -127,8 +169,10 @@ nompers:hasIso639P3Code a owl:DatatypeProperty, owl:FunctionalProperty ;
 
 nompers:hasCoordinates a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:label "has coordinates" ;
+    rdfs:comment "Geographic coordinates of a language, modelled as a geo:Point with geo:lat and geo:long datatype properties." ;
     rdfs:domain nompers:Language ;
-    rdfs:range geo:Point .
+    rdfs:range geo:Point ;
+    rdfs:seeAlso <https://www.w3.org/2003/01/geo/#lat> .
 
 # ======================================================================
 #  Class nompers:Genus
@@ -142,17 +186,6 @@ nompers:Genus a owl:Class ;
     rdfs:label "Genus" ;
     rdfs:comment "A genus-level languoid. While decisions as to what tree depth counts as a genus is somewhat arbitrary, an intermediate level of genealogical relations is useful. This follows the practice (and largely the assignments) of WALS. Names for genus instances should be provided with skos:prefLabel/skos:altLabel relations." .
 
-nompers:hasGenusMember a owl:ObjectProperty ;
-    owl:inverseOf nompers:inGenus ;
-    rdfs:label "has language member" ;
-    rdfs:domain nompers:Genus ;
-    rdfs:range nompers:Language .
-
-nompers:hasFamilyMember a owl:ObjectProperty ;
-    owl:inverseOf nompers:inFamily ;
-    rdfs:label "has family member" ;
-    rdfs:domain nompers:Family ;
-    rdfs:range nompers:Language .
 
 # ======================================================================
 #  Class nompers:Family
@@ -162,7 +195,7 @@ nompers:Family a owl:Class ;
     rdfs:subClassOf nompers:Languoid ;
     rdfs:subClassOf [a owl:Restriction ;
             owl:onProperty nompers:isTerminal ;
-            owl:hasValue "False" ] ;
+            owl:hasValue false ] ;
     rdfs:label "Language family" ;
     rdfs:comment "A family-level languoid. Names for family instances should be provided with skos:prefLabel/skos:altLabel relations." .
 
@@ -230,7 +263,9 @@ nompers:ParameterValue a owl:Class ;
 nompers:isPotentialValueOf a owl:ObjectProperty ;
     owl:inverseOf nompers:hasPotentialValue ;
     rdfs:label "is potential value of" ;
-    rdfs:comment "Relates a value to a parameter" .
+    rdfs:comment "Relates a value to a parameter" ;
+    rdfs:domain nompers:ParameterValue ;
+    rdfs:range nompers:Parameter .
 
 # ======================================================================
 # Class: nompers:Source
@@ -292,6 +327,7 @@ nompers:relatesParameterValue  a owl:ObjectProperty, owl:FunctionalProperty ;
 nompers:sourcedFrom a owl:ObjectProperty ;
     rdfs:label "sourced from" ;
     rdfs:comment "Bibliographic source for a parameter association or example" ;
+    rdfs:domain nompers:ParameterAssociation , nompers:Example ;
     rdfs:range nompers:Source .
 
 
@@ -319,11 +355,11 @@ nompers:primaryText a rdf:Property, owl:DatatypeProperty ;
     rdfs:domain nompers:Example ;
     rdfs:range xsd:string ;
     rdfs:label "Primary Text" ;
-    rdfs:comment "The example text in the source language." .
+    rdfs:comment "The example text in the source language (transcribed)." .
 
 nompers:analyzedWord a rdf:Property, owl:DatatypeProperty ;
     rdfs:domain nompers:Example ;
-    rdfs:range rdf:List;
+    rdfs:range xsd:string;
     rdfs:label "Analyzed Word" ;
     rdfs:comment "The example text analysed into morphemes. Stored as string, tabs are used for alignment with nompers:gloss" .
 
@@ -350,3 +386,14 @@ nompers:ControlParameter a owl:Class ;
     rdfs:subClassOf nompers:Parameter ;
     rdfs:label "Control parameter" ;
     rdfs:comment "A typological control variable (e.g. word order) included for comparative analysis." .
+
+
+# ===============================
+# Import of geo:point
+# ===============================
+
+geo:Point a owl:Class ;
+    rdfs:label "Geographic Point" ;
+    rdfs:comment "A point representing geographic coordinates." ;
+    rdfs:seeAlso <https://www.w3.org/2003/01/geo/> .
+
