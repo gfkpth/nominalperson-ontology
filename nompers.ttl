@@ -102,52 +102,52 @@ nompers:Language a owl:Class ;
 #   Language → Genus → Family
 #
 # The relations are:
-#   - langInGenus:      Language → Genus    (a language belongs to one genus)
-#   - langInFamily:     Language → Family   (a language belongs to one family)
-#   - genInFamily:   Genus → Family      (a genus belongs to one family)
+#   - languageInGenus:      Language → Genus    (a language belongs to one genus)
+#   - languageInFamily:     Language → Family   (a language belongs to one family)
+#   - genusInFamily:   Genus → Family      (a genus belongs to one family)
 #
 # The reverse properties allow navigation in the opposite direction:
-#   - genHasMember:      Genus → Language
-#   - famHasLangMember:     Family → Language
-#   - famHasGenMember:    Family → Genus
+#   - genusHasMember:      Genus → Language
+#   - familyHasLangMember:     Family → Language
+#   - familyHasGenMember:    Family → Genus
 #
 # Note: All child-to-parent relations (inGenus, inFamily, isInFamily) are functional.
 # Each languoid has exactly one parent in this concept; 
 # creoles and mixed languages raise further issues, which I set aside here.
 
-nompers:langInGenus a owl:ObjectProperty, owl:FunctionalProperty ;
+nompers:languageInGenus a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Language ;
     rdfs:range nompers:Genus ;
     rdfs:label "member of genus" ;
     rdfs:comment "Relates a language to the genus it belongs to." .
 
 # could be inferred nompers:langInGenus and  
-nompers:langInFamily a owl:ObjectProperty, owl:FunctionalProperty ;
+nompers:languageInFamily a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Language ;
     rdfs:range nompers:Family ;
     rdfs:label "member of language family" ;
     rdfs:comment "Relates a language to the family it belongs to." .
 
-nompers:genInFamily a owl:ObjectProperty, owl:FunctionalProperty ;
+nompers:genusInFamily a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain nompers:Genus ;
     rdfs:range nompers:Family ;
     rdfs:label "is in family" ;
     rdfs:comment "Relates a genus to the language family it belongs to." .
 
-nompers:genHasMember a owl:ObjectProperty ;
-    owl:inverseOf nompers:langInGenus ;
+nompers:genusHasMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:languageInGenus ;
     rdfs:label "has language member" ;
     rdfs:domain nompers:Genus ;
     rdfs:range nompers:Language .
 
-nompers:famHasLangMember a owl:ObjectProperty ;
-    owl:inverseOf nompers:langInFamily ;
+nompers:familyHasLangMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:languageInFamily ;
     rdfs:label "has family member" ;
     rdfs:domain nompers:Family ;
     rdfs:range nompers:Language .
 
-nompers:famHasGenMember a owl:ObjectProperty ;
-    owl:inverseOf nompers:genInFamily ;
+nompers:familyHasGenMember a owl:ObjectProperty ;
+    owl:inverseOf nompers:genusInFamily ;
     rdfs:label "has genus in family" ;
     rdfs:domain nompers:Family ;
     rdfs:range nompers:Genus .
