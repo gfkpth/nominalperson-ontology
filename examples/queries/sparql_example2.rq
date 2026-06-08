@@ -1,0 +1,20 @@
+# Example SPARQL query: Find all parameters for a specific language
+# Query: What parameters are defined for German (glottocode: stan1295)?
+
+PREFIX nompers: <https://w3id.org/nompers#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?parameter ?value ?source
+WHERE {
+  ?assoc a nompers:ParameterAssociation .
+  ?assoc nompers:relatesLanguoid ?language .
+  ?assoc nompers:relatesParameter ?parameter .
+  ?assoc nompers:relatesParameterValue ?value .
+  ?assoc nompers:sourcedFrom ?source .
+  
+  ?language nompers:hasGlottocode "stan1295" .
+  
+  ?parameter rdfs:label ?paramLabel .
+  ?value rdfs:label ?valueLabel .
+  ?source nompers:hasBibtex ?bibtex .
+}

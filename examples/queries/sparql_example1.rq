@@ -1,0 +1,18 @@
+# Example SPARQL query: Find languages with a specific parameter value
+# Query: Which languages have verb-object (VO) word order?
+
+PREFIX nompers: <https://w3id.org/nompers#>
+
+SELECT ?language ?parameter ?value
+WHERE {
+  ?assoc a nompers:ParameterAssociation .
+  ?assoc nompers:relatesLanguoid ?language .
+  ?assoc nompers:relatesParameter ?parameter .
+  ?assoc nompers:relatesParameterValue ?value .
+  
+  ?parameter rdfs:label "verb object order" .
+  ?value rdfs:label "VO" .
+  
+  ?language nompers:hasGlottocode ?glottocode .
+  ?language nompers:hasWalsId ?wals .
+}
