@@ -1,0 +1,5 @@
+nominalperson_cldf
+*.pyc
+__pycache__/
+catalog-*.xml
+nompers_inference.ttl
