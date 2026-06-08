@@ -2,7 +2,7 @@
 # Importing namespaces
 ########################
 
-@prefix nompers: <https://w3id.org/nompers#> .
+@prefix nompers: <https://w3id.org/gfkpth/nompers-ont#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -20,7 +20,7 @@ nompers: a owl:Ontology ;
     dct:title "Nominal Person Ontology (NomPersOnt)" ;
     dct:creator "Georg F.K. Höhn" ;
     dct:created "2026-03-31"^^xsd:date ;
-    owl:versionIRI <https://w3id.org/nompers/0.1.0> ;
+    owl:versionIRI <https://w3id.org/gfkpth/nompers-ont/0.1.0> ;
     owl:versionInfo "0.1.0" ;
     dct:modified "2026-04-07"^^xsd:date ;
     dct:publisher <https://morelight.goip.de> ;
@@ -140,13 +140,13 @@ nompers:genusHasMember a owl:ObjectProperty ;
     rdfs:domain nompers:Genus ;
     rdfs:range nompers:Language .
 
-nompers:familyHasLangMember a owl:ObjectProperty ;
+nompers:familyHasLanguageMember a owl:ObjectProperty ;
     owl:inverseOf nompers:languageInFamily ;
     rdfs:label "has family member" ;
     rdfs:domain nompers:Family ;
     rdfs:range nompers:Language .
 
-nompers:familyHasGenMember a owl:ObjectProperty ;
+nompers:familyHasGenusMember a owl:ObjectProperty ;
     owl:inverseOf nompers:genusInFamily ;
     rdfs:label "has genus in family" ;
     rdfs:domain nompers:Family ;
