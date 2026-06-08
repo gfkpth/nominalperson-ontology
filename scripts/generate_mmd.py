@@ -2,6 +2,14 @@ import argparse
 from rdflib import Graph, RDFS, RDF, OWL, Namespace
 
 def get_prefix(uri,no_prefix=False):
+    # Special handling for geo: vs geo1: rdflib mapping
+    if 'www.w3.org/2003/01/' in str(uri):
+        # Map both geo and geo1 to 'geo' for cleaner output
+        if no_prefix:
+            return str(uri).split('#')[-1]
+        else:
+            return f"geo_{uri.split('#')[-1]}"
+    
     for prefix, ns in PREFIXES.items():
         if uri.startswith(ns):
             if no_prefix:
@@ -33,7 +41,7 @@ def generate_class_diagram(graph, include_datatype_properties=True, no_prefix=Fa
     for s, p, o in graph.triples((None, RDF.type, OWL.ObjectProperty)):
         property_name = get_prefix(s,no_prefix)
         if property_name not in object_properties:
-            object_properties[property_name] = {'domains': [], 'ranges': []}
+            object_properties[property_name] = {'domains': [], 'ranges': [], 'label': property_name, 'comment': ''}
 
 
     
@@ -42,7 +50,7 @@ def generate_class_diagram(graph, include_datatype_properties=True, no_prefix=Fa
     for s, p, o in graph.triples((None, RDF.type, OWL.DatatypeProperty)):
         property_name = get_prefix(s,no_prefix)
         if property_name not in datatype_properties:
-            datatype_properties[property_name] = {'domains': [], 'ranges': []}
+            datatype_properties[property_name] = {'domains': [], 'ranges': [], 'label': property_name, 'comment': ''}
 
 
     # Collect domains and ranges of properties
@@ -64,23 +72,21 @@ def generate_class_diagram(graph, include_datatype_properties=True, no_prefix=Fa
 
     # Collect labels and comments for properties
     for s, p, o in graph.triples((None, RDFS.label, None)):
-        if p == RDFS.label:
-            property_name = get_prefix(s,no_prefix)
-            label = o.toPython()
-            if property_name in object_properties:
-                object_properties[property_name]['label'] = label
-            elif property_name in datatype_properties:
-                datatype_properties[property_name]['label'] = label
+        property_name = get_prefix(s,no_prefix)
+        label = o.toPython()
+        if property_name in object_properties:
+            object_properties[property_name]['label'] = label
+        elif property_name in datatype_properties:
+            datatype_properties[property_name]['label'] = label
 
     if incl_comments:
         for s, p, o in graph.triples((None, RDFS.comment, None)):
-            if p == RDFS.comment:
-                property_name = get_prefix(s,no_prefix)
-                comment = o.toPython()
-                if property_name in object_properties:
-                    object_properties[property_name]['comment'] = comment
-                elif property_name in datatype_properties:
-                    datatype_properties[property_name]['comment'] = comment
+            property_name = get_prefix(s,no_prefix)
+            comment = o.toPython()
+            if property_name in object_properties:
+                object_properties[property_name]['comment'] = comment
+            elif property_name in datatype_properties:
+                datatype_properties[property_name]['comment'] = comment
 
     # Add classes and datatype properties to Mermaid
     for cls in classes:
@@ -103,13 +109,19 @@ def generate_class_diagram(graph, include_datatype_properties=True, no_prefix=Fa
 
     # Add object properties to Mermaid
     for prop_name, prop_info in object_properties.items():
-        domains = ', '.join(prop_info['domains'])
-        ranges = ', '.join(prop_info['ranges'])
+        domains = prop_info['domains']
+        ranges = prop_info['ranges']
+        if not domains or not ranges:
+            continue  # Skip properties without domain/range defined
         label = prop_info.get('label', prop_name)
         comment = prop_info.get('comment', '')
-        mermaid.append(f"{domains} --> {ranges} : {label}")
-        if comment:
-            mermaid[-1] += f'  // {comment}'
+        # Handle multiple domains/ranges by creating separate edges
+        for domain in domains:
+            for range_val in ranges:
+                line = f"{domain} --> {range_val} : {label}"
+                if comment:
+                    line += f'  // {comment}'
+                mermaid.append(line)
 
     return "\n".join(mermaid)
 
