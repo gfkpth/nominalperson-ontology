@@ -152,7 +152,6 @@ nompers:familyHasGenusMember a owl:ObjectProperty ;
     rdfs:domain nompers:Family ;
     rdfs:range nompers:Genus .
 
-
 nompers:hasWalsId   a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label      "WALS ID" ;
     rdfs:comment    "WALS identifier. URI pattern: https://wals.info/languoid/lect/wals_code_{walscode}" ;
@@ -167,7 +166,7 @@ nompers:hasIso639P3Code a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://iso639-3.sil.org/> ;
     rdfs:label "ISO 639-3 Code" .
 
-nompers:hasCoordinates a owl:ObjectProperty, owl:FunctionalProperty ;
+nompers:hasCoordinates a owl:ObjectProperty ;
     rdfs:label "has coordinates" ;
     rdfs:comment "Geographic coordinates of a language, modelled as a geo:Point with geo:lat and geo:long datatype properties." ;
     rdfs:domain nompers:Language ;
@@ -229,6 +228,8 @@ nompers:regionHasMember a owl:ObjectProperty ;
 # ======================================================================
 # Class: nompers:Parameter
 # ======================================================================
+# Restriction: Parameters need at least one value
+
 nompers:Parameter a owl:Class ;
     rdfs:subClassOf skos:Concept ;
     rdfs:label "Parameter" ;
@@ -347,7 +348,7 @@ nompers:Example rdf:type owl:Class ;
     rdfs:comment "Represents a linguistic example from a language." .
 
 
-nompers:inLanguoid rdf:type owl:ObjectProperty ;
+nompers:fromLanguoid rdf:type owl:ObjectProperty ;
     rdfs:label "from Languoid" ;
     rdfs:comment "Indicates the language of the example" ;
     rdfs:domain nompers:Example ;
