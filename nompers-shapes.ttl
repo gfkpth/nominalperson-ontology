@@ -1,0 +1,157 @@
+@prefix nompers: <https://w3id.org/gfkpth/nompers-ont#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix geo: <https://www.w3.org/2003/01/geo/#> .
+
+
+# Import the core ontology so SHACL can resolve class/property URIs
+nompers: a owl:Ontology ;
+    owl:imports <https://w3id.org/gfkpth/nompers-ont> .
+
+
+nompers:LanguageShape a sh:NodeShape ;
+    sh:targetClass nompers:Language ;
+    sh:property [
+        sh:path nompers:hasGlottocode ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Every Language must have exactly one Glottocode."
+    ] ;
+    sh:property [
+        sh:path nompers:languageInGenus ;
+        sh:class nompers:Genus ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "A Language can only be a member of one Genus."
+    ] ;
+    sh:property [
+        sh:path nompers:languageInFamily ;
+        sh:maxCount 1 ;
+        sh:class nompers:Family ;
+        sh:severity sh:Violation ;
+        sh:message "A Language can only be a member of one Family."
+    ] .
+
+nompers:GenusShape a sh:NodeShape ;
+    sh:targetClass nompers:Genus ;
+    sh:property  [
+        sh:path nompers:genusInFamily ;
+        sh:class nompers:Family ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "A Genus can only be a member of one Family."
+    ] .
+
+nompers:ParameterShape a sh:NodeShape ;
+    sh:targetClass nompers:Parameter ;
+    sh:property [
+        sh:path nompers:hasPotentialValue ;
+        sh:minCount 2 ;
+        sh:class nompers:ParameterValue ;
+        sh:severity sh:Warning ;
+        sh:message "Parameters typically have at least two potential parameter values. (But cf. Biberauer et al. 2014 on the possibility of 'no-choice parameters'.)"
+     ] .
+
+nompers:ParameterValueShape a sh:NodeShape ;
+    sh:targetClass nompers:ParameterValue ;
+    sh:property [
+        sh:path nompers:isPotentialValueOf ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class nompers:Parameter ;
+        sh:severity sh:Violation ;
+        sh:message "A ParameterValue has to be a potential value of exactly one Parameter."
+    ] .
+
+nompers:ParameterAssociationShape a sh:NodeShape ;
+    sh:targetClass nompers:ParameterAssociation ;
+    sh:property [
+        sh:path nompers:relatesLanguoid ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class nompers:Languoid ;
+        sh:severity sh:Violation ;
+        sh:message "A ParameterAssociation involves exactly one Languoid."
+    ] ;
+    sh:property [
+        sh:path nompers:relatesParameter ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class nompers:Parameter ;
+        sh:severity sh:Violation ;
+        sh:message "A ParameterAssociation involves exactly one Parameter."
+    ] ;
+    sh:property [
+        sh:path nompers:relatesParameterValue ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class nompers:ParameterValue ;
+        sh:severity sh:Violation ;
+        sh:message "A ParameterAssociation involves exactly one ParameterValue."
+    ] .
+
+nompers:ParameterAssociationCoherenceShape a sh:NodeShape ;                                                                                                                                                                                                                                           
+    sh:targetClass nompers:ParameterAssociation ;                                                                                                                                                                                                                                                     
+    sh:property [                                                                                                                                                                                                                                                                                     
+        sh:path nompers:relatesParameter ;                                                                                                                                                                                                                                                            
+        sh:node [                                                                                                                                                                                                                                                                                     
+            sh:property [                                                                                                                                                                                                                                                                             
+                sh:path nompers:hasPotentialValue ;                                                                                                                                                                                                                                                   
+                sh:class nompers:ParameterValue ;                                                                                                                                                                                                                                                     
+                sh:hasValueFrom [                                                                                                                                                                                                                                                                     
+                    sh:path nompers:relatesParameterValue                                                                                                                                                                                                                                             
+                ]                                                                                                                                                                                                                                                                                     
+            ]                                                                                                                                                                                                                                                                                         
+        ] ;
+        sh:severity sh:Violation ;
+        sh:message "A ParameterValue in a ParameterAssociation needs to be a potential value of the Parameter involved in the ParameterAssociation."                                                                                                                                                                                                                                                                                         
+    ] .
+
+nompers:SourceShape a sh:NodeShape ;                                                                                                                                                                                                                                                                  
+    sh:targetClass nompers:Source ;                                                                                                                                                                                                                                                                   
+    sh:property [                                                                                                                                                                                                                                                                                     
+        sh:path nompers:hasBibtex ;                                                                                                                                                                                                                                                                   
+        sh:minCount 1 ;                                                                                                                                                                                                                                                                               
+        sh:severity sh:Warning ;                                                                                                                                                                                                                                                                      
+        sh:message "A Source should have a BibTeX entry."                                                                                                                                                                                                                                             
+    ] .  
+
+nompers:ExampleShape a sh:NodeShape ;
+    sh:targetClass nompers:Example ;
+    sh:property [
+        sh:path nompers:fromLanguoid ;
+        sh:minCount 1 ;
+        sh:class nompers:Languoid ;
+        sh:severity sh:Violation ;
+        sh:message "An Example must be associated with a Languoid."
+    ] ;
+    sh:property [
+        sh:path nompers:primaryText ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:severity sh:Violation ;
+        sh:message "An Example must contain exactly one actual example."
+    ] .
+
+nompers:PointShape a sh:NodeShape ;
+    sh:targetClass geo:Point ;
+    sh:property [
+        sh:path geo:lat ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:severity sh:Violation ;
+        sh:message "Each geo:Point must have exactly one latitude. The value is expected as a string"
+    ] ;
+    sh:property [
+        sh:path geo:lon ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:severity sh:Violation ;
+        sh:message "Each geo:Point must have exactly one longitude. The value is expected as a string"
+    ] .
